@@ -10,6 +10,7 @@ As per https://www.vagrantup.com/docs/installation/
 ```
 vagrant plugin install vagrant-env
 vagrant plugin install vagrant-hostmanager
+vagrant plugin install vagrant-persistent-storage
 ```
 
 ## Install Python virtualenv
@@ -50,10 +51,10 @@ cd eramba-vagrant
 ansible-galaxy install --ignore-errors -r requirements.yml
 ```
 
-## Create myslq backup directory
-This directory will be mounted in the VM to be used as the target for eramba db backups.
+## Create local data directories
+This directory will be mounted in the VM as `/var/lib/mysql`.
 ```
-mkdir -p .data/backups
+mkdir -p .data/mysql
 ```
 
 ## Install ansible roles

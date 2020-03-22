@@ -7,6 +7,14 @@ Vagrant.configure("2") do |config|
   config.hostmanager.ignore_private_ip = false
   config.hostmanager.include_offline = true
 
+  config.persistent_storage.enabled = false
+  config.persistent_storage.location = ".data/mysql.vdi"
+  config.persistent_storage.size = 1000
+  config.persistent_storage.mountname = "mysql"
+  config.persistent_storage.filesystem = "ext4"
+  config.persistent_storage.mountpoint = "/var/lib/mysql"
+  config.persistent_storage.use_lvm = true
+
   config.vm.box = ENV['VAGRANT_BOXNAME']
   config.vm.hostname = ENV['VAGRANT_HOSTNAME']
   config.vm.network :private_network, ip: ENV['VAGRANT_IP']
@@ -22,7 +30,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "os", type: "ansible" do |ansible|
     ansible.compatibility_mode = "2.0"
     ansible.playbook = "ansible/playbooks/os.yml"
-    ansible.extra_vars = {}
+    ansible.extra_vars = {
+      ubuntu_upgrade: ENV['UBUNTU_UPGRADE'],
+    }
   end
 
   config.vm.provision "mysql", type: "ansible" do |ansible|

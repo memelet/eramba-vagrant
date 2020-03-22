@@ -10,7 +10,7 @@
     - name: update OS packages
       apt:
         update_cache: "yes"
-        upgrade: "yes"
+        upgrade: "{{ ubuntu_upgrade }}"
         only_upgrade: "no"
 
     - name: install packages
