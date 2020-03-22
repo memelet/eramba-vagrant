@@ -1,0 +1,20 @@
+.vagrant/
+.data/
+.dist/
+
+ansible/playbook.retry
+ansible/roles/
+
+# All other idea project files are safe to commit
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/mongoSettings.xml
+.idea/watcherTasks.xml
+.idea/deployment.xml
+.idea/markdown-navigator/
+.idea/markdown-exported-files.xml
+.idea/markdown-navigator.xml
+.idea/sonarlint/issue-store
+.idea/sonarlint/
+.idea/markdown-navigator*
+/.dist/eramba_community/

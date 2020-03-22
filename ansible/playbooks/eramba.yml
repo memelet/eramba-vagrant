@@ -1,0 +1,113 @@
+- name: Install eramba
+  hosts: all
+  become: yes
+
+  module_defaults:
+    apt:
+      force_apt_get: yes
+
+  vars:
+    apache_remove_default_vhost: true
+    apache_global_vhost_settings: |
+      ServerName {{ apache_servername }}
+    apache_vhosts:
+      - servername: "{{ apache_servername }}"
+        documentroot: "{{ eramba_www_path }}/"
+        options: "+Indexes +FollowSymLinks -MultiViews"
+        extra_parameters: |
+          ErrorLog ${APACHE_LOG_DIR}/eramba.org.error.log
+          CustomLog ${APACHE_LOG_DIR}/eramba.org.access.log combined
+
+    php_default_version_debian: 7.2
+    php_packages_extra:
+      - php{{ php_default_version_debian }}-common
+      - php{{ php_default_version_debian }}-gd
+      - php{{ php_default_version_debian }}-intl
+      - php{{ php_default_version_debian }}-json
+      - php{{ php_default_version_debian }}-mbstring
+      - php{{ php_default_version_debian }}-zip
+      - php{{ php_default_version_debian }}-exif
+      - php{{ php_default_version_debian }}-ldap
+      - php{{ php_default_version_debian }}-curl
+      - php{{ php_default_version_debian }}-mysql
+      - php{{ php_default_version_debian }}-readline
+      - php{{ php_default_version_debian }}-xml
+      - php{{ php_default_version_debian }}-bz2
+      - php{{ php_default_version_debian }}-simplexml
+
+    php_memory_limit: 4096M
+    php_post_max_size: 300M
+    php_file_uploads: On
+    php_upload_max_filesize: 300M
+    php_max_execution_time: 300
+    php_allow_url_fopen: On
+    php_max_input_vars: 3000
+    php_max_input_time: 60
+
+  roles:
+    - role: geerlingguy.apache
+    - role: geerlingguy.php
+
+  post_tasks:
+    - name: install mod-php
+      apt:
+        state: present
+        pkg: libapache2-mod-php
+
+    - name: Download eramba distribution
+      get_url:
+        url: "{{ eramba_tgz_url }}"
+        dest: /tmp/{{ eramba_tgz_file }}
+
+    - name: Extract eramba.tgz
+      unarchive:
+        remote_src: yes
+        src: /tmp/{{ eramba_tgz_file }}
+        dest: /var/www/html
+        owner: www-data
+
+    - name: Configure database.php
+      template:
+        src: eramba/database.php.j2
+        dest: "{{ eramba_www_path }}/app/Config/database.php"
+        owner: www-data
+
+    - name: Create eramba mysql database
+      mysql_db:
+        state: present
+        name: "{{ eramba_db_name }}"
+        login_host: "{{ eramba_db_host }}"
+        login_user: "{{ mysql_root_username }}"
+        login_password: "{{ mysql_root_password }}"
+      notify:
+        - Create eramba schema
+
+    - name: Create eramba mysql user
+      mysql_user:
+        state: present
+        name: "{{ eramba_db_user }}"
+        host: "%"
+        password: "{{ eramba_db_password }}"
+        priv: "{{ eramba_db_name }}.*:ALL"
+        login_host: "{{ eramba_db_host }}"
+        login_user: "{{ mysql_root_username }}"
+        login_password: "{{ mysql_root_password }}"
+
+    - name: Download wkhtmltopdf package
+      get_url:
+        url: "{{ wkhtmltopdf_deb_url }}"
+        dest: /tmp/{{ wkhtmltopdf_deb_file }}
+
+    - name: Install wkhtmltopdf
+      apt:
+        deb: "/tmp/{{ wkhtmltopdf_deb_file }}"
+
+  handlers:
+    - name: Create eramba schema
+      mysql_db:
+        state: import
+        name: "{{ eramba_db_name }}"
+        target: "{{ eramba_www_path }}/app/Config/db_schema/{{ eramba_version }}.sql"
+        login_host: "{{ eramba_db_host }}"
+        login_user: "{{ eramba_db_user }}"
+        login_password: "{{ eramba_db_password }}"

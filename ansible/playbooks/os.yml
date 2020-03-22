@@ -1,0 +1,23 @@
+- name: Install packages
+  hosts: all
+  become: yes
+
+  module_defaults:
+    apt:
+      force_apt_get: yes
+
+  tasks:
+    - name: update OS packages
+      apt:
+        update_cache: "yes"
+        upgrade: "yes"
+        only_upgrade: "no"
+
+    - name: install packages
+      apt:
+        state: present
+        pkg: "{{ packages }}"
+      vars:
+        packages:
+          - python-pip
+          - python-apt

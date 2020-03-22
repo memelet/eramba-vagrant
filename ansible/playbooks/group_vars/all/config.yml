@@ -1,0 +1,16 @@
+mysql_root_username: root
+mysql_root_password: root
+mysql_vagrant_host_root_access: false
+
+apache_servername: eramba
+
+eramba_db_host: localhost
+eramba_db_name: eramba_v2
+eramba_db_user: eramba
+eramba_db_password: eramba
+
+eramba_tgz_file: eramba-{{ eramba_version }}.tgz
+eramba_www_path: /var/www/html/{{ eramba_www_dir }}
+
+wkhtmltopdf_deb_file: wkhtmltox_{{ wkhtmltopdf_version }}-1.bionic_amd64.deb
+wkhtmltopdf_deb_url: https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ wkhtmltopdf_version }}/{{ wkhtmltopdf_deb_file }}

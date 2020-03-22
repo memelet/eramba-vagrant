@@ -1,0 +1,11 @@
+- src: geerlingguy.mysql
+  path: roles/
+
+- src: geerlingguy.apache
+  path: roles/
+
+- src: geerlingguy.php
+  path: roles/
+
+- src: geerlingguy.php-mysql
+  path: roles/

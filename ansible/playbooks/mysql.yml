@@ -1,0 +1,27 @@
+- name: Install MySQL
+  hosts: all
+  become: yes
+
+  module_defaults:
+    apt:
+      force_apt_get: yes
+
+  vars:
+    mysql_max_allowed_packet: 128M
+    mysql_innodb_lock_wait_timeout: 200
+    mysql_sql_mode: NO_ENGINE_SUBSTITUTION
+    mysql_root_password_update: true
+    mysql_user_password_update: true
+
+  roles:
+    - role: geerlingguy.mysql
+
+  post_tasks:
+    - name: Ensure root can login from the vagrant host (role geerlingguy.mysql does not support this)
+      when: mysql_vagrant_host_root_access|bool == true
+      mysql_user:
+        state: present
+        name: "{{ mysql_root_username }}"
+        host: '%'
+        password: "{{ mysql_root_password }}"
+        priv: '*.*:ALL,GRANT'

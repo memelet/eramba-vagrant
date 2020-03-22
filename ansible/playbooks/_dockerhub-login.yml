@@ -1,0 +1,10 @@
+- assert:
+    that:
+      - dockerhub_username is defined and dockerhub_username|trim != ""
+      - dockerhub_password is defined and dockerhub_password|trim != ""
+    fail_msg: "variables 'dockerhub_username' and 'dockerhub_password' must be defined"
+
+- name: login to dockerhub
+  docker_login:
+    username: "{{ dockerhub_username }}"
+    password: "{{ dockerhub_password }}"
